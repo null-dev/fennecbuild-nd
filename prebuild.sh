@@ -19,10 +19,17 @@
 
 set -e
 
+pkgNameSuffixDef="fennec_fdroid"
+appDisplayNameDef="Fennec"
+
 if [ -z "$1" ] || [ -z "$2" ]; then
-    echo "Usage: $0 versionName versionCode" >&1
+    echo "Usage: $0 versionName versionCode packageNameSuffix[default=$pkgNameSuffixDef] appDisplayName[default=$appDisplayNameDef]" >&1
     exit 1
 fi
+
+pkgNameSuffix="${3:-$pkgNameSuffixDef}"
+appDisplayName="${4:-$appDisplayNameDef}"
+
 
 # shellcheck source=paths.sh
 source "$(dirname "$0")/paths.sh"
@@ -60,12 +67,12 @@ echo 'https://gitlab.com/relan/fennecmedia/-/raw/master/wallpapers/android' > fe
 pushd "$fenix"
 # Set up the app ID, version name and version code
 sed -i \
-    -e 's|\.firefox|.fennec_fdroid|' \
+    -e "s|\.firefox|.$pkgNameSuffix|" \
     -e "s/Config.releaseVersionName(project)/'$1'/" \
     -e "s/Config.generateFennecVersionCode(arch, aab)/$2/" \
     app/build.gradle
 sed -i \
-    -e '/android:targetPackage/s/firefox/fennec_fdroid/' \
+    -e "/android:targetPackage/s/firefox/$pkgNameSuffix/" \
     app/src/release/res/xml/shortcuts.xml
 
 # Compile nimbus-fml instead of using prebuilt
@@ -104,13 +111,13 @@ sed -i \
     app/build.gradle
 
 # Let it be Fennec
-sed -i -e 's/Firefox Daylight/Fennec/; s/Firefox/Fennec/g' \
+sed -i -e "s/Firefox Daylight/$appDisplayName/; s/Firefox/$appDisplayName/g" \
     app/src/*/res/values*/*strings.xml
 # Fenix uses reflection to create a instance of profile based on the text of
 # the label, see
 # app/src/main/java/org/mozilla/fenix/perf/ProfilerStartDialogFragment.kt#185
 sed -i \
-    -e '/Firefox(.*, .*)/s/Firefox/Fennec/' \
+    -e "/Firefox(.*, .*)/s/Firefox/$appDisplayName/" \
     -e 's/firefox_threads/fennec_threads/' \
     -e 's/firefox_features/fennec_features/' \
     app/src/main/java/org/mozilla/fenix/perf/ProfilerUtils.kt

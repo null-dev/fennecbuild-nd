@@ -7,6 +7,11 @@ Scripts and patches to compile [Fennec F-Droid](https://f-droid.org/packages/org
 
 where VERCODE is a version code number.
 
+Fork changes
+------------
+
+Two additional arguments have been added to `prebuild.sh`: `packageNameSuffix` and `appDisplayName`. Both values default to their default Fennec values. You should avoid using special characters in both arguments.
+
 Licenses
 --------
 
