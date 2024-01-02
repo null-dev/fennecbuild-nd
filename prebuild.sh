@@ -57,6 +57,9 @@ sed -i '/val revision = /a \        val statusSuffix = "+"' android-components/p
 # Patch the use of proprietary and tracking libraries
 patch -p1 --no-backup-if-mismatch --quiet < "$patches/fenix-liberate.patch"
 
+# Fix profiling code to not use reflection
+patch -p1 --no-backup-if-mismatch --quiet < "$patches/profiler-fix.patch"
+
 # Add wallpaper URL
 echo 'https://gitlab.com/relan/fennecmedia/-/raw/master/wallpapers/android' > fenix/.wallpaper_url
 
@@ -117,7 +120,7 @@ sed -i -e "s/Firefox Daylight/$appDisplayName/; s/Firefox/$appDisplayName/g" \
 # the label, see
 # app/src/main/java/org/mozilla/fenix/perf/ProfilerStartDialogFragment.kt#185
 sed -i \
-    -e "/Firefox(.*, .*)/s/Firefox/$appDisplayName/" \
+    -e '/Browser("Firefox"'", .*, .*)/s/Firefox/$appDisplayName/" \
     -e 's/firefox_threads/fennec_threads/' \
     -e 's/firefox_features/fennec_features/' \
     app/src/main/java/org/mozilla/fenix/perf/ProfilerUtils.kt

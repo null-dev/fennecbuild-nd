@@ -1,0 +1,40 @@
+diff --git a/fenix/app/src/main/java/org/mozilla/fenix/perf/ProfilerStartDialogFragment.kt b/fenix/app/src/main/java/org/mozilla/fenix/perf/ProfilerStartDialogFragment.kt
+index 5ff637b1d4..059cfcf296 100644
+--- a/fenix/app/src/main/java/org/mozilla/fenix/perf/ProfilerStartDialogFragment.kt
++++ b/fenix/app/src/main/java/org/mozilla/fenix/perf/ProfilerStartDialogFragment.kt
+@@ -182,7 +182,7 @@ class ProfilerStartDialogFragment : AppCompatDialogFragment() {
+                         onClick = {
+                             viewStateObserver.value = CardState.WaitForProfilerToStart
+                             executeStartProfilerOnClick(
+-                                ProfilerSettings.valueOf(featureAndThreadsObserver.value),
++                                ProfilerSettings.forType(featureAndThreadsObserver.value)!!,
+                                 startProfiler,
+                             )
+                         },
+diff --git a/fenix/app/src/main/java/org/mozilla/fenix/perf/ProfilerUtils.kt b/fenix/app/src/main/java/org/mozilla/fenix/perf/ProfilerUtils.kt
+index a71b0e3cc7..07879e0738 100644
+--- a/fenix/app/src/main/java/org/mozilla/fenix/perf/ProfilerUtils.kt
++++ b/fenix/app/src/main/java/org/mozilla/fenix/perf/ProfilerUtils.kt
+@@ -83,11 +83,17 @@ private val networking_threads = arrayOf(
+ /**
+  * Profiler settings enum for grouping features and settings together
+  */
+-enum class ProfilerSettings(val threads: Array<String>, val features: Array<String>) {
+-    Firefox(firefox_threads, firefox_features),
+-    Graphics(graphics_threads, graphics_features),
+-    Media(media_threads, media_features),
+-    Networking(networking_threads, networking_features),
++enum class ProfilerSettings(val type: String, val threads: Array<String>, val features: Array<String>) {
++    Browser("Firefox", firefox_threads, firefox_features),
++    Graphics("Graphics", graphics_threads, graphics_features),
++    Media("Media", media_threads, media_features),
++    Networking("Networking", networking_threads, networking_features);
++
++    companion object {
++        fun forType(type: String): ProfilerSettings? {
++            return values().find { it.type == type }
++        }
++    }
+ }
+ 
+ /**
